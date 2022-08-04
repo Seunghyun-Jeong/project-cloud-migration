@@ -40,15 +40,15 @@ module.exports = async function (fastify, opts) {
 
   fastify.post("/signup", async function (request, reply){
     const {loginname, password, name} = request.body
-
     const connection = await fastify.mysql.getConnection()
-    const [rows, fields] = await connection.query(
-      `insert into users (loginname, password, name, role) values (?, ?, ?, ?)`, [loginname, password, name, 'member']
-    )
+    const [rows, fields] = await connection.query(`select * from users where loginname=? and name=?`, [loginname, name])
+    if (rows.length === 0) {
+      connection.query(`insert into users (loginname, password, name, role) values (?, ?, ?, ?)`, [loginname, password, name, 'member'])
+    }
+    else {
+      return "중복된 회원가입입니다."
+    }
     connection.release()
-
-    // TODO: 중복 회원가입에 대한 에러처리 필요
     reply.code(201).send({'message': 'ok'})
   })
-
 }
