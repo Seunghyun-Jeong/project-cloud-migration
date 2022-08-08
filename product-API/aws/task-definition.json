@@ -1,10 +1,11 @@
 {
-    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:191591157355:task-definition/Project4-PM-DynamoDB:2",
+    "taskDefinitionArn": "arn:aws:ecs:ap-northeast-2:191591157355:task-definition/Project4-PM-DynamoDB:3",
     "containerDefinitions": [
         {
             "name": "PM-DynamoDB",
             "image": "191591157355.dkr.ecr.ap-northeast-2.amazonaws.com/project4-test-ecr",
             "cpu": 0,
+            "links": [],
             "portMappings": [
                 {
                     "containerPort": 80,
@@ -13,24 +14,41 @@
                 }
             ],
             "essential": true,
-            "environment": [],
+            "entryPoint": [],
+            "command": [],
+            "environment": [
+                {
+                    "name": "JWT_SECRET",
+                    "value": "supersecret"
+                }
+            ],
+            "environmentFiles": [],
             "mountPoints": [],
             "volumesFrom": [],
+            "secrets": [],
+            "dnsServers": [],
+            "dnsSearchDomains": [],
+            "extraHosts": [],
+            "dockerSecurityOptions": [],
+            "dockerLabels": {},
+            "ulimits": [],
             "logConfiguration": {
                 "logDriver": "awslogs",
                 "options": {
                     "awslogs-group": "/ecs/Project4-PM-DynamoDB",
                     "awslogs-region": "ap-northeast-2",
                     "awslogs-stream-prefix": "ecs"
-                }
-            }
+                },
+                "secretOptions": []
+            },
+            "systemControls": []
         }
     ],
     "family": "Project4-PM-DynamoDB",
     "taskRoleArn": "arn:aws:iam::191591157355:role/ecsTaskExecutionRole",
     "executionRoleArn": "arn:aws:iam::191591157355:role/ecsTaskExecutionRole",
     "networkMode": "awsvpc",
-    "revision": 2,
+    "revision": 3,
     "volumes": [],
     "status": "ACTIVE",
     "requiresAttributes": [
@@ -45,6 +63,9 @@
         },
         {
             "name": "com.amazonaws.ecs.capability.docker-remote-api.1.19"
+        },
+        {
+            "name": "com.amazonaws.ecs.capability.docker-remote-api.1.17"
         },
         {
             "name": "com.amazonaws.ecs.capability.task-iam-role"
@@ -72,7 +93,16 @@
     "runtimePlatform": {
         "operatingSystemFamily": "LINUX"
     },
-    "registeredAt": "2022-08-08T06:40:12.063Z",
-    "registeredBy": "arn:aws:iam::191591157355:root",
-    "tags": []
+    "registeredAt": "2022-08-08T08:35:22.240Z",
+    "registeredBy": "arn:aws:iam::191591157355:user/PSE",
+    "tags": [
+        {
+            "key": "ecs:taskDefinition:createdFrom",
+            "value": "ecs-console-v2"
+        },
+        {
+            "key": "ecs:taskDefinition:stackId",
+            "value": "arn:aws:cloudformation:ap-northeast-2:191591157355:stack/ECS-Console-V2-TaskDefinition-250fa001-ae28-430c-bfc8-e4315f36422e/07e35150-16f5-11ed-9a8f-0a2d2c58dbc0"
+        }
+    ]
 }
