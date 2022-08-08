@@ -1,9 +1,9 @@
 'use strict'
 
-const products = [
-  {id: 1, name: '2021년 달력', price: 6000, description: '최-신 2021년 달력'},
-  {id: 2, name: '외계어 번역기', price: 12000, description: '화성어과 금성어간의 통역이 가능합니다'},
-]
+// const products = [
+//   {id: 1, name: '2021년 달력', price: 6000, description: '최-신 2021년 달력'},
+//   {id: 2, name: '외계어 번역기', price: 12000, description: '화성어과 금성어간의 통역이 가능합니다'},
+// ]
 
 module.exports = async function (fastify, opts) {
   fastify.decorate("authenticate", async function(request, reply){
@@ -14,23 +14,69 @@ module.exports = async function (fastify, opts) {
     }
   })
 
-  fastify.get('/', {
-    onRequest:[fastify.authenticate]
-  }, async function (request, reply) {
-    reply.send(products)
-  })
+  fastify.get(
+    '/',
+    async (request, reply) => {
+      let data
+      const params = {
+        TableName: "product",
+      };
+      try {
+        data = await fastify.dynamo.scan(params).promise();
+      } catch (e) {
+         reply.send(e)
+      }
+      return { data }
+    },
+  )
+
+  fastify.get(
+    '/:id',
+    async (request, reply) => {
+      let data
+      console.log(request.params);
+      const { id } = request.params;
+      const params = {
+        TableName: "product",
+        Key: {
+          id : parseInt(id)
+        },
+      };
+      try {
+        data = await fastify.dynamo.get(params).promise();
+      } catch (e) {
+         reply.send(e)
+      }
+      return { data }
+    },
+  )
+  // fastify.get('/', {
+  //   // onRequest:[fastify.authenticate]
+  // }, async function (request, reply) {
+  //   reply.send(products)
+  // })
 
   fastify.post('/', {
-    onRequest:[fastify.authenticate]
+    // onRequest:[fastify.authenticate]
   }, async function (request, reply) {
-    const {name, price, description} = request.body
+    const {id, name, price, description} = request.body
+    console.log(request.body)
     const newItem = {
-      id: products.length,
-      name,
-      price,
-      description
+      TableName: "product",
+      Item: {
+        id,
+        name,
+        price,
+        description
+      }
     }
-    products.push(newItem)
-    reply.code(201).send(newItem)
-  })
+    console.log(newItem)
+    try {
+      const data = await fastify.dynamo.put(newItem).promise();
+      return { data }
+    } catch (e) {
+       reply.send(e)
+    }
+  }
+)
 }
