@@ -1,10 +1,5 @@
 'use strict'
 
-// const products = [
-//   {id: 1, name: '2021년 달력', price: 6000, description: '최-신 2021년 달력'},
-//   {id: 2, name: '외계어 번역기', price: 12000, description: '화성어과 금성어간의 통역이 가능합니다'},
-// ]
-
 module.exports = async function (fastify, opts) {
   fastify.decorate("authenticate", async function(request, reply){
     try {
@@ -14,9 +9,7 @@ module.exports = async function (fastify, opts) {
     }
   })
 
-  fastify.get(
-    '/',
-    async (request, reply) => {
+  fastify.get('/', async (request, reply) => {
       let data
       const params = {
         TableName: "product",
@@ -30,9 +23,7 @@ module.exports = async function (fastify, opts) {
     },
   )
 
-  fastify.get(
-    '/:id',
-    async (request, reply) => {
+  fastify.get('/:id', async (request, reply) => {
       let data
       console.log(request.params);
       const { id } = request.params;
@@ -50,14 +41,8 @@ module.exports = async function (fastify, opts) {
       return { data }
     },
   )
-  // fastify.get('/', {
-  //   // onRequest:[fastify.authenticate]
-  // }, async function (request, reply) {
-  //   reply.send(products)
-  // })
 
   fastify.post('/', {
-    // onRequest:[fastify.authenticate]
   }, async function (request, reply) {
     const {id, name, price, description} = request.body
     console.log(request.body)
