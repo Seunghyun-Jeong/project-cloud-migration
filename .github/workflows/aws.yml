@@ -34,11 +34,11 @@ on:
 env:
   AWS_REGION: ap-northeast-2                  # set this to your preferred AWS region, e.g. us-west-1
   ECR_REPOSITORY: project4-tert-ecr           # set this to your Amazon ECR repository name
-  ECS_SERVICE: service00                # set this to your Amazon ECS service name
-  ECS_CLUSTER: ECS-private                 # set this to your Amazon ECS cluster name
-  ECS_TASK_DEFINITION: MY_ECS_TASK_DEFINITION # set this to the path to your Amazon ECS task definition
+  ECS_SERVICE: PM-DynamoDB-SV               # set this to your Amazon ECS service name
+  ECS_CLUSTER: PM-DyanmoDB                 # set this to your Amazon ECS cluster name
+  ECS_TASK_DEFINITION: ./product-API/awstask-definition.json # set this to the path to your Amazon ECS task definition
                                                # file, e.g. .aws/task-definition.json
-  CONTAINER_NAME: MY_CONTAINER_NAME           # set this to the name of the container in the
+  CONTAINER_NAME: PM-DynamoDB         # set this to the name of the container in the
                                                # containerDefinitions section of your task definition
 
 permissions:
@@ -74,6 +74,7 @@ jobs:
         # Build a docker container and
         # push it to ECR so that it can
         # be deployed to ECS.
+        cd product-API
         docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG .
         docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
         echo "::set-output name=image::$ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG"
