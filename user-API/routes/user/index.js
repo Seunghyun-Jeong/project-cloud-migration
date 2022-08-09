@@ -46,7 +46,7 @@ module.exports = async function (fastify, opts) {
       connection.query(`insert into users (loginname, password, name, role) values (?, ?, ?, ?)`, [loginname, password, name, 'member'])
     }
     else {
-      return "중복된 회원가입입니다."
+      reply.code(409).send({'message': '중복된 회원가입입니다.'})
     }
     connection.release()
     reply.code(201).send({'message': 'ok'})
