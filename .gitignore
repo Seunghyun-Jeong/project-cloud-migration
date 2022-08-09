@@ -58,3 +58,5 @@ profile-*
 profile*
 *clinic*
 *flamegraph*
+
+.aws-sam
