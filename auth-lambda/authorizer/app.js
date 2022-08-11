@@ -4,7 +4,7 @@ exports.handler = async(event) => {
     let token = event.headers.authorization.split(" ")[1];
   
     try {
-      var decoded = jwt.verify(token, 'supersecret')
+      var decoded = jwt.verify(token, process.env.JWT_SECRET)
       console.log("allowed");
       return {
         "principalId": "*",
