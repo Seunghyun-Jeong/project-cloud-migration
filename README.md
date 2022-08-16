@@ -119,7 +119,7 @@ Postmen으로 API Gateway의 엔드포인트로 **Request 보내는 방법**
 
 {
   "loginname": "kimcoding",
-  "password": "qwert1234"
+  "password": "qwerty"
 }
 ```
 
