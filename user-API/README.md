@@ -24,7 +24,7 @@ terraform을 사용해서 프로젝트에서 필요한 사내 정보 시스템 a
 
 mysql 과 Git이 제대로 설치되었는지 확인하려면 `mysql --version`, `Git --version` 명령어를 사용합니다.
 
-이제 복제된 리포지토리(Repository)된 폴더 중 uer-API폴더에 있는 aacompany_dump.sql파일을 덤프(dump)해 줍니다.
+이제 복제된 리포지토리(Repository)중 uer-API폴더에 있는 aacompany_dump.sql파일을 덤프(dump)해 줍니다.
 
 ## main README.md로 옮길 내용
 
