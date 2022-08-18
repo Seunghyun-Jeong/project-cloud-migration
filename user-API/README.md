@@ -15,22 +15,22 @@ terraform을 사용해서 프로젝트에서 필요한 사내 정보 시스템 a
 
 두 가지의 작업이 필요합니다.
 
-공식 문서를 통헤서  mysql을 설치가 필요합니다.
+공식 문서를 통헤서 mysql을 설치가 필요합니다.
 
 사내 정보 시스템을 가져오기 위해서 이 리포지토리(Repository)를 프라이빗 EC2에 GitHub를 통해서 복제 합니다. 
 
 - mysql 설치 https://dev.mysql.com/doc/mysql-shell/8.0/en/mysql-shell-install-linux-quick.html
 - Git   설치 https://git-scm.com/book/en/v2/Getting-Started-Installing-Git
 
-mysql 과 Git이 제대로 설치되었는지 확인려면 `mysql --version`, `Git --version` 명령어를 사용합니다.
+mysql 과 Git이 제대로 설치되었는지 확인하려면 `mysql --version`, `Git --version` 명령어를 사용합니다.
 
-이제 복제된 리포지토리(Repository)된 폴더중 uer-API폴더에 있는 aacompany_dump.sql파일을 덤프(dump)해 줍니다.
+이제 복제된 리포지토리(Repository)된 폴더 중 uer-API폴더에 있는 aacompany_dump.sql파일을 덤프(dump)해 줍니다.
 
 ## main README.md로 옮길 내용
 
 1. USER-EC2.tf 파일에서 `key_name` 부분에 자신의 케페어를 작성해 줍니다
 
-1. terraform 명령어를 통해 구축합니다.
+1. terraform 명령어를 통해 aws 스택을 생성 합니다.
 
 1. `terraform init` `terraform plan` `terraform apply`
 
