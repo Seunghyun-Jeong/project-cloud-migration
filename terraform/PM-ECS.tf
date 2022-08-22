@@ -1,5 +1,5 @@
 resource "aws_cloudwatch_log_group" "log" {
-  name = "PM-DynamoDB"
+  name = "/aws/task/${aws_ecs_task_definition.ecs_taskdef.id}"
 }
 
 
@@ -18,17 +18,6 @@ resource "aws_ecs_cluster" "ECS-cluster" {
 }
 
 
-# module "ecs_cluster" {
-#   source = "anrim/ecs/aws//modules/cluster"
-
-#   name = "app-dev"
-#   vpc_id      = "${module.vpc.vpc_id}"
-#   vpc_subnets = ["${module.vpc.private_subnets}"]
-#   tags        = {
-#     Environment = "dev"
-#     Owner = "me"
-#   }
-# }
 
 //ecs service 생성
 resource "aws_ecs_service" "demo-ecs-service" {
@@ -135,16 +124,6 @@ resource "aws_iam_policy" "policy" {
 EOF
 }
 
-            # "Resource": [
-            #     "arn:aws:ssm:ap-northeast-2:{aws계정ID}:*",
-            #     "arn:aws:secretsmanager:ap-northeast-2:{aws계정ID}::*",
-            #     "arn:aws:kms:ap-northeast-2:{aws계정ID}:*"
-// 위의 arn에서 237212383149는 자신의 iam 계정으로 바꿀 것!!!
-
-
-
-// attachment = 부착하다 policy(정책)를 role(역할)에 추가하고 싶다.
-// role의 이름, policy_arn을 지정해주면 연결된다.
 
 resource "aws_iam_role_policy_attachment" "ecs-task" {
   role       = aws_iam_role.ecs_task_exec_role.name
@@ -165,21 +144,3 @@ resource "aws_iam_role_policy_attachment" "ecs-task3" {
   role       = aws_iam_role.ecs_task_exec_role.name
   policy_arn = "arn:aws:iam::aws:policy/AmazonDynamoDBFullAccess"
 }
-
-# //ecs task 역할
-# resource "aws_iam_role" "ecs_task_role" {
-#   name = "ecs_task_role"
-#   assume_role_policy = jsonencode({
-#     Version = "2012-10-17"
-#     Statement = [
-#       {
-#         Action = "sts:AssumeRole"
-#         Effect = "Allow"
-#         Principal = {
-#           Service = "ecs-tasks.amazonaws.com"
-#         }
-#       },
-
-#     ]
-#   })
-# }
