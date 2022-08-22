@@ -60,3 +60,7 @@ profile*
 *flamegraph*
 
 .aws-sam
+variable.tf
+.terraform
+.terraform.lock.hcl
+auth-lambda.js.zip
