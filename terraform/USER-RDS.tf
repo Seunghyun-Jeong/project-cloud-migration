@@ -22,9 +22,9 @@ resource "aws_db_instance" "testDB" {
   engine_version         = "8.0.28"
   instance_class         = "db.t2.micro"
   skip_final_snapshot    = true
-  identifier             = "test-mysql"
+  identifier             = "user-mysql"
   username               = "admin"
   password               = "qwer1234"
-  name                   = "testDB"
+  db_name                = "aacompany"
   port                   = "3306"
 } 
