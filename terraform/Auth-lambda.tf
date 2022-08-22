@@ -1,21 +1,21 @@
 data "archive_file" "lambda_my_function" {
   type             = "zip"
-  source_dir       = "${path.module}/../auth-lambda/authorizer"
-  output_path      = "${path.module}/auth-lambda.js.zip"
+  source_dir       = "${path.module}/../auth-lambda"
+  output_path      = "${path.module}/auth-lambda.zip"
 
 }
 
 resource "aws_lambda_function" "auth_lambda" {
-  filename      = "./auth-lambda.js.zip"
+  filename      = "./auth-lambda.zip"
   function_name = "auth-lambda"
   role          = aws_iam_role.lambda.arn
-  handler       = "handler.handler"
+  handler       = "auth-lambda/app.handler"
 
 
   // 처음 plan할 경우 바로 아랫줄은 주석 처리 할것. .zip 파일 만들어진게 없어서 에러뜸
   # source_code_hash = filebase64sha256("./auth-lambda.js.zip")
 
-  runtime = "nodejs14.x"
+  runtime = "nodejs16.x"
 
   environment {
     variables = "${var.JWT_SECRET_lambda}"
