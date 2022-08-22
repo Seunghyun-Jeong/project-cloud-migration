@@ -1,4 +1,3 @@
-# Create the VPC Link configured with the private subnets. Security groups are kept empty here, but can be configured as required.
 //vpc link PM 생성
 resource "aws_apigatewayv2_vpc_link" "vpclink_PM" {
   name        = "vpclink_PM"
@@ -69,8 +68,8 @@ resource "aws_apigatewayv2_integration" "apigw_integration-user-get" {
   depends_on      = [aws_apigatewayv2_vpc_link.vpclink_UserAuth]
 }
 
-// POST /user/login 통합
-resource "aws_apigatewayv2_integration" "apigw_integration-user-login" {
+// POST /user/login,signup 통합
+resource "aws_apigatewayv2_integration" "apigw_integration-user-post" {
   api_id           = aws_apigatewayv2_api.http-api.id
   integration_type = "HTTP_PROXY"
   integration_uri  = aws_service_discovery_service.namespace-service.arn
@@ -82,18 +81,6 @@ resource "aws_apigatewayv2_integration" "apigw_integration-user-login" {
   depends_on      = [aws_apigatewayv2_vpc_link.vpclink_UserAuth]
 }
 
-// POST /user/signup 통합
-resource "aws_apigatewayv2_integration" "apigw_integration-user-signup" {
-  api_id           = aws_apigatewayv2_api.http-api.id
-  integration_type = "HTTP_PROXY"
-  integration_uri  = aws_service_discovery_service.namespace-service.arn
-
-  integration_method = "POST"
-  connection_type    = "VPC_LINK"
-  connection_id      = aws_apigatewayv2_vpc_link.vpclink_UserAuth.id
-  payload_format_version = "1.0"
-  depends_on      = [aws_apigatewayv2_vpc_link.vpclink_UserAuth]
-}
 
 # API GW route with ANY method
 // POST /product 경로 생성
@@ -101,7 +88,8 @@ resource "aws_apigatewayv2_route" "POST-product" {
   api_id    = aws_apigatewayv2_api.http-api.id
   route_key = "POST /product"
   target = "integrations/${aws_apigatewayv2_integration.apigw_integration-product-post.id}"
-  # authorization_scopes = aws_apigatewayv2_authorizer.lambda-GW-auth.id
+  authorization_type = "CUSTOM"
+  authorizer_id = aws_apigatewayv2_authorizer.lambda-GW-auth.id
   depends_on  = [aws_apigatewayv2_integration.apigw_integration-product-post]
 }
 
@@ -110,12 +98,12 @@ resource "aws_apigatewayv2_route" "GET-product" {
   api_id    = aws_apigatewayv2_api.http-api.id
   route_key = "GET /product"
   target = "integrations/${aws_apigatewayv2_integration.apigw_integration-product-get.id}"
-  # authorization_type = "CUSTOM"
-  # authorization_scopes = [aws_apigatewayv2_authorizer.lambda-GW-auth.name]
+  authorization_type = "CUSTOM"
+  authorizer_id = aws_apigatewayv2_authorizer.lambda-GW-auth.id
   depends_on  = [aws_apigatewayv2_integration.apigw_integration-product-get]
 }
 
-//여기에 권한도 부여해줘야하는데 authorization_scopes를 어떻게 작성하는지 모르겠음.
+
 
 // GET /user 경로 생성
 resource "aws_apigatewayv2_route" "GET-user" {
@@ -129,8 +117,8 @@ resource "aws_apigatewayv2_route" "GET-user" {
 resource "aws_apigatewayv2_route" "GET-user-login" {
   api_id    = aws_apigatewayv2_api.http-api.id
   route_key = "POST /user/login"
-  target = "integrations/${aws_apigatewayv2_integration.apigw_integration-user-login.id}"
-  depends_on  = [aws_apigatewayv2_integration.apigw_integration-user-login]
+  target = "integrations/${aws_apigatewayv2_integration.apigw_integration-user-post.id}"
+  depends_on  = [aws_apigatewayv2_integration.apigw_integration-user-post]
 }
 
 
@@ -138,8 +126,8 @@ resource "aws_apigatewayv2_route" "GET-user-login" {
 resource "aws_apigatewayv2_route" "GET-user-signup" {
   api_id    = aws_apigatewayv2_api.http-api.id
   route_key = "POST /user/signup"
-  target = "integrations/${aws_apigatewayv2_integration.apigw_integration-user-signup.id}"
-  depends_on  = [aws_apigatewayv2_integration.apigw_integration-user-signup]
+  target = "integrations/${aws_apigatewayv2_integration.apigw_integration-user-post.id}"
+  depends_on  = [aws_apigatewayv2_integration.apigw_integration-user-post]
 }
 
 // 람다 권한 부여자 설정
@@ -147,7 +135,7 @@ resource "aws_apigatewayv2_authorizer" "lambda-GW-auth" {
   api_id           = aws_apigatewayv2_api.http-api.id
   authorizer_type  = "REQUEST"
   authorizer_uri   = aws_lambda_function.auth_lambda.invoke_arn
-  authorizer_credentials_arn = aws_iam_role.iam_for_lambda.arn
+  authorizer_credentials_arn = aws_iam_role.invocation_role.arn
   identity_sources = ["$request.header.authorization"]
   name             = "Lambd-Auth"
   authorizer_result_ttl_in_seconds = 1
@@ -155,11 +143,44 @@ resource "aws_apigatewayv2_authorizer" "lambda-GW-auth" {
 
 }
 
-// 람다 연결하기 Routes
+resource "aws_iam_role" "invocation_role" {
+  name = "api_gateway_auth_invocation"
+  path = "/"
 
+  assume_role_policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "sts:AssumeRole",
+      "Principal": {
+        "Service": "apigateway.amazonaws.com"
+      },
+      "Effect": "Allow",
+      "Sid": ""
+    }
+  ]
+}
+EOF
+}
 
+resource "aws_iam_role_policy" "invocation_policy" {
+  name = "default"
+  role = aws_iam_role.invocation_role.id
 
-
+  policy = <<EOF
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Action": "lambda:InvokeFunction",
+      "Effect": "Allow",
+      "Resource": "${aws_lambda_function.auth_lambda.arn}"
+    }
+  ]
+}
+EOF
+}
 
 
 
@@ -171,38 +192,3 @@ resource "aws_apigatewayv2_stage" "apigw_stage" {
   auto_deploy = true
   depends_on  = [aws_apigatewayv2_api.http-api]
 }
-
-# # Generated API GW endpoint URL that can be used to access the application running on a private ECS Fargate cluster.
-# output "apigw_endpoint" {
-#   value = aws_apigatewayv2_api.apigw_http_endpoint.api_endpoint
-#     description = "API Gateway Endpoint"
-# }
-
-# resource "aws_apigatewayv2_integration" "apigw_user-get" {
-#   api_id           = aws_apigatewayv2_api.http-api.id
-#   integration_type = "HTTP_PROXY"
-#   integration_uri  = aws_lb_listener.terramino.arn
-
-#   integration_method = "ANY"
-#   connection_type    = "VPC_LINK"
-#   connection_id      = aws_apigatewayv2_vpc_link.vpclink_PM.id
-#   payload_format_version = "1.0"
-#   depends_on      = [aws_apigatewayv2_vpc_link.vpclink_PM,  
-#                     aws_lb_listener.terramino]
-# }
-
-# # API GW route with ANY method
-# resource "aws_apigatewayv2_route" "apigw_route" {
-#   api_id    = aws_apigatewayv2_api.http-api.id
-#   route_key = "ANY /product"
-#   target = "integrations/${aws_apigatewayv2_integration.apigw_integration-product.id}"
-#   depends_on  = [aws_apigatewayv2_integration.apigw_integration-product]
-# }
-
-# # Set a default stage
-# resource "aws_apigatewayv2_stage" "apigw_stage" {
-#   api_id = aws_apigatewayv2_api.http-api.id
-#   name   = "$default"
-#   auto_deploy = true
-#   depends_on  = [aws_apigatewayv2_api.http-api]
-# }
