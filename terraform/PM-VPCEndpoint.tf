@@ -11,6 +11,8 @@ resource "aws_vpc_endpoint" "ecr-api" {
     aws_subnet.PM-VPC_private_subnet1.id,
     aws_subnet.PM-VPC_private_subnet2.id
   ]
+  private_dns_enabled = true
+
   tags  = {
     Name = "ECR-API"
   }
@@ -31,6 +33,8 @@ resource "aws_vpc_endpoint" "ecr-dkr" {
     aws_subnet.PM-VPC_private_subnet1.id,
     aws_subnet.PM-VPC_private_subnet2.id
   ]
+  private_dns_enabled = true
+
   tags  = {
     Name = "ECR-DKR"
   }
@@ -49,6 +53,8 @@ resource "aws_vpc_endpoint" "SSM" {
     aws_subnet.PM-VPC_private_subnet1.id,
     aws_subnet.PM-VPC_private_subnet2.id
   ]
+  private_dns_enabled = true
+
   tags  = {
     Name = "SSM"
   }
