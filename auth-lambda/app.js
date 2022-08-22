@@ -1,7 +1,7 @@
 var jwt = require('jsonwebtoken');
 
 exports.handler = async(event) => {
-    let token = event.headers.Authorization.split(" ")[1];
+    let token = event.headers.authorization.split(" ")[1];
   
     try {
       var decoded = jwt.verify(token, process.env.JWT_SECRET)
