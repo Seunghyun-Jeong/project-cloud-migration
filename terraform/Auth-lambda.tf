@@ -72,7 +72,7 @@ resource "aws_iam_policy" "lambda_logging" {
                 "logs:PutLogEvents"
             ],
             "Resource": [
-                "arn:aws:logs:ap-northeast-2:{aws계정ID}:log-group:/aws/lambda/auth:*"
+                "arn:aws:logs:ap-northeast-2:{aws계정ID}:log-group:/aws/lambda/auth_lambda:*"
             ]
         }
     ]
